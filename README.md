@@ -10,28 +10,28 @@ Cada participante possui um score de participação, que aumenta quando ele comp
 
 Além disso, o aplicativo permite registrar fotos das resenhas realizadas, criando um histórico social do grupo.
 
-🚀 Funcionalidades
+Requisitos do Projeto
 
-Criação de enquetes para organizar resenhas
+Funcionalidades (O que o app faz)
 
-Votação de presença dos participantes
+Criação de Enquetes: Organizar detalhes da resenha (data, local e tema).
 
-Sistema de score de participação
+Confirmação de Presença: Votação para saber quem vai, quem não vai ou quem está em dúvida.
 
-Cálculo da porcentagem de chance da resenha acontecer
+Cálculo de Viabilidade: Exibir a porcentagem de chance da resenha acontecer com base nos confirmados.
 
-Histórico de resenhas realizadas
+Sistema de Score: Ranking de participação para incentivar a presença dos amigos.
 
-Álbum de fotos por evento
+Histórico e Álbum: Lista de eventos passados com galeria de fotos de cada encontro.
 
-🧠 Tecnologias utilizadas
+Tecnologias Utilizadas
+Framework: React Native (Expo)
 
-React Native
+Linguagem: TypeScript
 
-JavaScript
+Armazenamento: AsyncStorage (Banco de dados local)
 
-Armazenamento local (AsyncStorage)
+Interface: React Native Components & Hooks
 
-🎯 Objetivo
-
-Facilitar a organização de encontros entre amigos e incentivar maior participação nos eventos do grupo.
+Objetivo
+Facilitar a organização de encontros entre amigos e aumentar o engajamento do grupo através de metas e histórico visual.
