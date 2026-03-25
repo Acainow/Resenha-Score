@@ -10,7 +10,7 @@ Cada participante possui um score de participação, que aumenta quando ele comp
 
 Além disso, o aplicativo permite registrar fotos das resenhas realizadas, criando um histórico social do grupo.
 
-Requisitos do Projeto
+✅Requisitos do Projeto
 
 Funcionalidades (O que o app faz)
 
@@ -24,7 +24,8 @@ Sistema de Score: Ranking de participação para incentivar a presença dos amig
 
 Histórico e Álbum: Lista de eventos passados com galeria de fotos de cada encontro.
 
-Tecnologias Utilizadas
+🔥Tecnologias Utilizadas
+
 Framework: React Native (Expo)
 
 Linguagem: TypeScript
