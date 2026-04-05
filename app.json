@@ -3,7 +3,7 @@
     "name": "Resenha Score",
     "slug": "resenha-score",
     "scheme": "resenha-score",
-    "version": "1.0.0 beta",
+    "version": "1.0.0-beta",
     "orientation": "portrait",
     "icon": "./assets/images/olhos.png",
     "userInterfaceStyle": "light",
@@ -26,7 +26,13 @@
       "package": "com.anonymous.resenhascore"
     },
     "plugins": [
-      "@react-native-community/datetimepicker"
-    ]
+      "@react-native-community/datetimepicker",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "502e02a3-77d0-4f3c-8022-083129559b91"
+      }
+    }
   }
 }
