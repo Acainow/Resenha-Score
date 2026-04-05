@@ -1,38 +1,50 @@
-ResenhaScore
+# Welcome to your Expo app 👋
 
-📚 Sobre o projeto
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-O ResenhaScore é um aplicativo mobile desenvolvido com o objetivo de ajudar grupos de amigos a organizarem encontros, atividades e resenhas de forma mais prática e inteligente.
+## Get started
 
-O aplicativo permite a criação de enquetes onde os participantes podem escolher opções de locais, esportes ou atividades e informar se irão comparecer ou não. A partir dessas respostas, o sistema calcula automaticamente a porcentagem de chance da resenha acontecer.
+1. Install dependencies
 
-Cada participante possui um score de participação, que aumenta quando ele comparece aos encontros e diminui quando ele falta. Esse score influencia no peso do voto de cada usuário no cálculo final da probabilidade da resenha.
+   ```bash
+   npm install
+   ```
 
-Além disso, o aplicativo permite registrar fotos das resenhas realizadas, criando um histórico social do grupo.
+2. Start the app
 
-✅Requisitos do Projeto
+   ```bash
+   npx expo start
+   ```
 
-Funcionalidades (O que o app faz)
+In the output, you'll find options to open the app in a
 
-Criação de Enquetes: Organizar detalhes da resenha (data, local e tema).
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-Confirmação de Presença: Votação para saber quem vai, quem não vai ou quem está em dúvida.
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-Cálculo de Viabilidade: Exibir a porcentagem de chance da resenha acontecer com base nos confirmados.
+## Get a fresh project
 
-Sistema de Score: Ranking de participação para incentivar a presença dos amigos.
+When you're ready, run:
 
-Histórico e Álbum: Lista de eventos passados com galeria de fotos de cada encontro.
+```bash
+npm run reset-project
+```
 
-🔥Tecnologias Utilizadas
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-Framework: React Native (Expo)
+## Learn more
 
-Linguagem: TypeScript
+To learn more about developing your project with Expo, look at the following resources:
 
-Armazenamento: AsyncStorage (Banco de dados local)
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-Interface: React Native Components & Hooks
+## Join the community
 
-Objetivo
-Facilitar a organização de encontros entre amigos e aumentar o engajamento do grupo através de metas e histórico visual.
+Join our community of developers creating universal apps.
+
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
