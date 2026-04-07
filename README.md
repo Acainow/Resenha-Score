@@ -1,50 +1,48 @@
-# Welcome to your Expo app 👋
+# 🏆 ResenhaScore
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**ResenhaScore** é um aplicativo mobile focado na organização de eventos sociais, trazendo gamificação de encontros (as famosas "resenhas") e aumentando o engajamento para grupos de amigos. 
 
-## Get started
+O projeto resolve o problema crônico da indecisão e da falta de compromisso em grupos sociais. Ele entrega valor através de um sistema inteligente de enquetes com cálculo dinâmico de probabilidade do evento acontecer, sendo ideal para jovens e adultos que costumam organizar resenhas, esportes ou churrascos.
 
-1. Install dependencies
+O grande diferencial do aplicativo é a sua **gamificação**: os usuários ganham ou perdem pontos de "score" dependendo da sua presença confirmada. Esse score afeta diretamente o peso dos seus votos nas próximas enquetes do grupo.
 
-   ```bash
-   npm install
-   ```
+## 📋 Funcionalidades Principais
 
-2. Start the app
+* **Criação de Enquetes:** Permite sugerir múltiplos locais e datas utilizando um calendário interativo.
+* **Confirmação de Presença:** Votação intuitiva com as opções "Sim", "Não" e "Talvez".
+* **Termômetro da Resenha:** Calcula automaticamente a porcentagem de chance do evento acontecer com base nas confirmações (limite padrão de 10 convidados).
+* **Sistema de Score (Ranking):** Mantém e atualiza a participação do usuário, somando +10 pontos para "Sim" e subtraindo -5 pontos para "Não".
+* **Votação Ponderada:** O peso do voto na enquete é influenciado diretamente pelo score atual do membro.
+* **Álbum da Comunidade:** Permite selecionar fotos de eventos passados e armazená-las localmente no app.
+* **Histórico:** Arquiva todas as enquetes finalizadas para consulta posterior.
 
-   ```bash
-   npx expo start
-   ```
+## 📱 Estrutura de Telas (UI)
 
-In the output, you'll find options to open the app in a
+A navegação do aplicativo é gerenciada via **Expo Router** e divide-se nas seguintes interfaces:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+* **Tela Inicial (Index):** Exibe o card de pontuação do usuário, a enquete ativa no momento, a barra animada de probabilidade e atalhos rápidos.
+* **Criar Enquete (Create):** Formulário de cadastro de eventos integrado ao componente *React Native Calendars* e toggle de configuração.
+* **Votação (Details):** Tela focada em conversão contendo os botões de interação e a visualização do impacto do voto em tempo real.
+* **Histórico (History):** Exibição do pódio de membros (gamificação) e lista em formato *read-only* das resenhas já encerradas.
+* **Álbum (Album):** Visualização em *Grid view* de imagens (em formato base64) selecionadas através do *Expo Image Picker*.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🛠️ Requisitos Técnicos e Stack
 
-## Get a fresh project
+O aplicativo foi construído com foco em uma arquitetura *Offline-first* (sem backend em nuvem).
 
-When you're ready, run:
+* **Linguagem:** TypeScript (~19.1.0).
+* **Framework / Plataforma:** React Native (0.81.5) integrado à plataforma Expo (~54.0.33).
+* **Roteamento:** Expo Router (~6.0.23).
+* **Armazenamento de Dados:** AsyncStorage (^3.0.2) e Expo Secure Store (^55.0.11).
+* **Controle de Versão:** Git / GitHub.
+* **Dependências / Terceiros:**
+  * *React Native Calendars* (seleção de datas).
+  * *Expo Image Picker* (manipulação da galeria).
+  * *Expo File System* e *Expo Haptics* (feedback físico).
+  * *@expo/vector-icons* (iconografia).
 
-```bash
-npm run reset-project
-```
+## 🎓 Contexto Acadêmico
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Este documento de especificação e projeto foi desenvolvido para a disciplina de **Linguagens e Técnica de Programação IV**, ministrada pelo Prof. **Marcos Raimundo Mendes Ramos**. Faz parte do curso de **Bacharelado em Sistemas de Informação** no **Instituto Federal de Educação, Ciência e Tecnologia do Tocantins (IFTO) - Campus Paraíso do Tocantins**.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Equipe de Desenvolvimento:** * Gabriel Aquino Carvalho Rodrigues
