@@ -1,48 +1,152 @@
-# 🏆 ResenhaScore
+# Resenha Score 🎉
 
-**ResenhaScore** é um aplicativo mobile focado na organização de eventos sociais, trazendo gamificação de encontros (as famosas "resenhas") e aumentando o engajamento para grupos de amigos. 
+Um app Expo/React Native para gerenciar resenhas em grupo com enquetes em tempo real, integrado com **Supabase** para autenticação e sincronização de dados.
 
-O projeto resolve o problema crônico da indecisão e da falta de compromisso em grupos sociais. Ele entrega valor através de um sistema inteligente de enquetes com cálculo dinâmico de probabilidade do evento acontecer, sendo ideal para jovens e adultos que costumam organizar resenhas, esportes ou churrascos.
+## 📋 Features
 
-O grande diferencial do aplicativo é a sua **gamificação**: os usuários ganham ou perdem pontos de "score" dependendo da sua presença confirmada. Esse score afeta diretamente o peso dos seus votos nas próximas enquetes do grupo.
+- ✅ **Autenticação com Email/Senha** (via Supabase)
+- ✅ **Banco de Dados em Nuvem** (Supabase PostgreSQL)
+- ✅ **Sincronização em Tempo Real** (Supabase Realtime)
+- ✅ **Múltiplos Usuários** (cada um com suas enquetes)
+- ✅ **Votação em Enquetes** (sim, não, talvez)
+- ✅ **Histórico de Resenhas** (persistência completa)
+- ✅ **Álbum de Fotos** (estrutura pronta)
 
-## 📋 Funcionalidades Principais
+## 🚀 Quick Start
 
-* **Criação de Enquetes:** Permite sugerir múltiplos locais e datas utilizando um calendário interativo.
-* **Confirmação de Presença:** Votação intuitiva com as opções "Sim", "Não" e "Talvez".
-* **Termômetro da Resenha:** Calcula automaticamente a porcentagem de chance do evento acontecer com base nas confirmações (limite padrão de 10 convidados).
-* **Sistema de Score (Ranking):** Mantém e atualiza a participação do usuário, somando +10 pontos para "Sim" e subtraindo -5 pontos para "Não".
-* **Votação Ponderada:** O peso do voto na enquete é influenciado diretamente pelo score atual do membro.
-* **Álbum da Comunidade:** Permite selecionar fotos de eventos passados e armazená-las localmente no app.
-* **Histórico:** Arquiva todas as enquetes finalizadas para consulta posterior.
+### 1. Clonar e Instalar
+```bash
+npm install
+```
 
-## 📱 Estrutura de Telas (UI)
+### 2. Configurar Supabase
+Veja [SUPABASE_SETUP.md](SUPABASE_SETUP.md) para instruções completas.
 
-A navegação do aplicativo é gerenciada via **Expo Router** e divide-se nas seguintes interfaces:
+Resumo rápido:
+1. Criar conta em [supabase.com](https://supabase.com)
+2. Copiar URL e ANON_KEY
+3. Preencher `.env` com as variáveis
+4. Executar SQL em `supabase/schema.sql`
 
-* **Tela Inicial (Index):** Exibe o card de pontuação do usuário, a enquete ativa no momento, a barra animada de probabilidade e atalhos rápidos.
-* **Criar Enquete (Create):** Formulário de cadastro de eventos integrado ao componente *React Native Calendars* e toggle de configuração.
-* **Votação (Details):** Tela focada em conversão contendo os botões de interação e a visualização do impacto do voto em tempo real.
-* **Histórico (History):** Exibição do pódio de membros (gamificação) e lista em formato *read-only* das resenhas já encerradas.
-* **Álbum (Album):** Visualização em *Grid view* de imagens (em formato base64) selecionadas através do *Expo Image Picker*.
+### 3. Iniciar o App
+```bash
+npm start
+```
 
-## 🛠️ Requisitos Técnicos e Stack
+Abrir em:
+- iOS Simulator: tecle `i`
+- Android Emulator: tecle `a`
+- Expo Go: escanear QR code
 
-O aplicativo foi construído com foco em uma arquitetura *Offline-first* (sem backend em nuvem).
+### 4. Testar Login
+- Email: qualquer email válido
+- Senha: qualquer senha
+- Signup: criar nova conta
+- App sincroniza automaticamente com Supabase
 
-* **Linguagem:** TypeScript .
-* **Framework / Plataforma:** React Native,integrado à plataforma Expo.
-* **Roteamento:** Expo Router).
-* **Armazenamento de Dados:** AsyncStorage e Expo Secure Store.
-* **Controle de Versão:** Git / GitHub.
-* **Dependências / Terceiros:**
-  * *React Native Calendars* (seleção de datas).
-  * *Expo Image Picker* (manipulação da galeria).
-  * *Expo File System* e *Expo Haptics* (feedback físico).
-  * *@expo/vector-icons* (iconografia).
+## 📁 Estrutura
 
-## 🎓 Contexto Acadêmico
+```
+app/
+  ├── _layout.tsx              # Roteamento protegido
+  ├── auth-layout.tsx          # Proteção de rotas
+  ├── login.tsx                # Tela de Login/Signup
+  ├── GlobalContext.tsx        # Context com Supabase integration
+  ├── (tabs)/                  # Abas principais (Index, Album, History, Create)
+  │   ├── _layout.tsx
+  │   ├── index.tsx            # Tela inicial
+  │   ├── album.tsx            
+  │   ├── create.tsx           # Criar enquete
+  │   ├── history.tsx
+  │   └── details.tsx
+  └── modal.tsx
 
-Este documento de especificação e projeto foi desenvolvido para a disciplina de **Linguagens e Técnica de Programação IV**, ministrada pelo Prof. **Marcos Raimundo Mendes Ramos**. Faz parte do curso de **Bacharelado em Sistemas de Informação** no **Instituto Federal de Educação, Ciência e Tecnologia do Tocantins (IFTO) - Campus Paraíso do Tocantins**.
+config/
+  └── supabase.ts             # Configuração Supabase
 
-**Equipe de Desenvolvimento:** * Gabriel Aquino Carvalho Rodrigues
+supabase/
+  └── schema.sql              # DDL das tabelas + RLS
+
+.env.example                  # Template de variáveis
+SUPABASE_SETUP.md            # Guia de setup completo
+```
+
+## 🔐 Autenticação
+
+### Fluxo
+1. Usuário abre app → verifica sessão
+2. Se não autenticado → redireciona para `/login`
+3. Signup/Login via Supabase Auth
+4. App carrega enquetes do usuário
+5. Listeners em tempo real sincronizam mudanças
+
+### Código
+```typescript
+const { signIn, signUp, signOut, user, session } = useAppContext();
+
+// Login
+await signIn(email, password);
+
+// Registrar
+await signUp(email, password, name);
+
+// Logout
+await signOut();
+```
+
+## 🔄 Sincronização em Tempo Real
+
+Quando **outro usuário** modifica uma enquete:
+- `enquetes` table: novos eventos são emitidos
+- Listeners no `GlobalContext` capturam mudanças
+- React state atualiza automaticamente
+- UI renderiza em tempo real
+
+Tabelas com Realtime ativado:
+- `enquetes`
+- `members`
+- `votos`
+
+## 📊 Tabelas Supabase
+
+### `enquetes`
+```sql
+id, userId, titulo, status, presentes, fotos, locais[], datas[], ...
+```
+
+### `members`
+```sql
+id, enqueteId, name, points
+```
+
+### `votos`
+```sql
+id, enqueteId, memberId, tipo ('sim'|'nao'|'talvez'), timestamp
+```
+
+## 🛡️ Segurança (RLS)
+
+Cada usuário:
+- ✅ Vê apenas suas enquetes
+- ✅ Não pode editar enquetes de outro usuário
+- ✅ RLS ativa em todas as tabelas
+- ✅ Autenticação via Supabase Sessions
+
+## 📝 Próximos Passos
+
+- [ ] Testar com múltiplos devices
+- [ ] Compartilhamento de enquetes (código/link convite)
+- [ ] Upload de fotos (Supabase Storage)
+- [ ] Notificações em tempo real
+- [ ] Build para produção (EAS)
+- [ ] Monetização
+
+## 📚 Documentação
+
+- [Supabase Docs](https://supabase.com/docs)
+- [Expo Router](https://expo.dev/router)
+- [React Native](https://reactnative.dev)
+
+## 🤝 Suporte
+
+Problemas? Veja [SUPABASE_SETUP.md](SUPABASE_SETUP.md) → Troubleshooting

@@ -32,7 +32,9 @@
     "extra": {
       "eas": {
         "projectId": "502e02a3-77d0-4f3c-8022-083129559b91"
-      }
+      },
+      "EXPO_PUBLIC_SUPABASE_URL": "https://mdgjlfstfwwxgqqosgcm.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_lLYvJT2A-SZo-goxXV0dTQ_BiXYMCxg"
     }
   }
 }

@@ -1,232 +1,217 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAppContext } from '../GlobalContext';
+import AppHeader from '../../components/ui/app-header';
+import { useAppContext } from '../_GlobalContext';
 
 const getRankInfo = (score: number) => {
   if (score >= 80) {
-    return { label: 'Rei da Resenha', emoji: '👑', color: '#FFD700' };
+    return { label: 'Rei da Resenha', emoji: '👑' };
   } else if (score >= 50) {
-    return { label: 'Entusiasta', emoji: '⚡', color: '#FF9500' };
+    return { label: 'Entusiasta', emoji: '⚡' };
   } else if (score >= 20) {
-    return { label: 'Participante', emoji: '🎯', color: '#34C759' };
-  } else {
-    return { label: 'Iniciante', emoji: '🌱', color: '#8E8E93' };
+    return { label: 'Participante', emoji: '🎯' };
   }
+  return { label: 'Iniciante', emoji: '🌱' };
 };
 
 export default function HomeScreen() {
   const router = useRouter();
-  
- const { score, tituloEnquete, confirmados, totalConvidados, datas, encerrarResenha } = useAppContext();
+  const { score, tituloEnquete, confirmados, totalConvidados, datas, encerrarResenha, groups, setTituloEnquete, setEnqueteAtivaId, enquetes } = useAppContext();
+  const { refreshAppData } = useAppContext();
+  const [refreshing, setRefreshing] = useState(false);
 
-  // 1. Números super seguros contra quebras (NaN)
   const convidadosNum = Number(totalConvidados) || 0;
   const confirmadosNum = Number(confirmados) || 0;
   const probabilidade = convidadosNum > 0 ? Math.round((confirmadosNum / convidadosNum) * 100) : 0;
-  
-  // 2. A MÁGICA AQUI: Só ativa o card principal se tiver título válido E pelo menos 1 convidado!
   const titulo = String(tituloEnquete || '').trim();
-  const temEnqueteAtiva = titulo.length > 0 && convidadosNum > 0;
-
   const rankInfo = getRankInfo(score || 0);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FAFBFB" />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        
-        {/* HEADER */}
-        <View style={styles.header}>
-          <Text style={styles.logo}>👀 ResenhaScore</Text>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={20} color="#6EFFA8" />
-          </View>
-        </View>
+  const { colors } = useAppContext();
 
-        {/* SCORE CARD */}
-        <View style={styles.scoreCard}>
-          <View style={styles.scoreContent}>
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background, paddingBottom: 18 }]}> 
+      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+      <ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scroll, { flexGrow: 1 }]}
+        overScrollMode="always"
+        nestedScrollEnabled
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              setRefreshing(true);
+              await refreshAppData();
+              setRefreshing(false);
+            }}
+            colors={[colors.primary]}
+            progressBackgroundColor={colors.card}
+          />
+        }
+      >
+        <AppHeader title="Resenha Score" />
+
+        <View style={[styles.scoreCard, { backgroundColor: colors.primary }]}>
+          <View>
             <Text style={styles.scoreLabel}>PONTUAÇÃO ATUAL</Text>
             <Text style={styles.scoreValue}>{score || 0}</Text>
             <View style={styles.rankBadge}>
+              <Ionicons name="sparkles" size={14} color="#FFF" />
               <Text style={styles.rankBadgeText}>{rankInfo.emoji} {rankInfo.label}</Text>
             </View>
           </View>
-          <Ionicons name="flash" size={120} color="#FFF" style={styles.scoreBackgroundIcon} />
+          <Ionicons name="flash" size={110} color={(colors.avatarText as string) ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.08)'} style={styles.scoreBackgroundIcon} />
         </View>
 
-        {/* BOTÃO CRIAR */}
-        <TouchableOpacity style={styles.btnCreate} onPress={() => router.navigate('/(tabs)/create')}>
-          <Ionicons name="add-circle" size={22} color="#FFF" />
-          <Text style={styles.btnCreateText}> Criar Nova Enquete</Text>
+        <TouchableOpacity style={[styles.btnCreate, { backgroundColor: colors.menuButtonBg, borderColor: colors.menuButtonBg }]} onPress={() => router.push('/create?mode=poll')}>
+          <Ionicons name="add-circle" size={22} color={colors.primary} />
+          <Text style={[styles.btnCreateText, { color: colors.primary }]}>Criar Nova Enquete</Text>
         </TouchableOpacity>
 
-        {/* SEÇÃO RESENHA EM DESTAQUE */}
-        <View style={styles.sectionHeader}>
-       {/* TÍTULO DA SEÇÃO */}
-      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1A1A1A', marginTop: 25, marginBottom: 15 }}>
-        Resenha em Destaque
-      </Text>
-      </View>
-
-      {/* MÁGICA DA ENQUETE CONDICIONAL */}
-      {tituloEnquete ? (
         
-        // ---- CARD COM A ENQUETE ATIVA ----
-        <View style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: 16,
-          padding: 20,
-          borderLeftWidth: 8,
-          borderLeftColor: '#55FF99', // A listra verde na lateral!
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 5,
-          elevation: 3
-        }}>
-          
-          <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#004643', marginBottom: 5 }}>
-            📅 AGORA
-          </Text>
 
-          {/* O TÍTULO REAL DA ENQUETE */}
-          <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1A1A1A', marginBottom: 15 }}>
-            {tituloEnquete}
-          </Text>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Resenha em Destaque</Text>
+        </View>
 
-          {/* DATAS SUGERIDAS */}
-          {datas && datas.length > 0 && (
-            <View style={{ marginBottom: 15 }}>
-              <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1A1A1A', marginBottom: 5 }}>
-                📅 Datas Sugeridas:
-              </Text>
-              {datas.map((data: string, idx: number) => (
-                <Text key={idx} style={{ fontSize: 13, color: '#6B7280', marginLeft: 10 }}>
-                  • {data}
-                </Text>
-              ))}
-            </View>
-          )}
+        {titulo ? (
+          <View style={[styles.featuredCard, { backgroundColor: colors.card, borderColor: colors.menuButtonBg }]}>
+            <Text style={[styles.featuredTag, { color: colors.primary }]}>📅 AGORA</Text>
+            <Text style={[styles.featuredTitle, { color: colors.text }]}>{titulo}</Text>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-            
-            {/* RODINHA DE PORCENTAGEM DINÂMICA */}
-            
-            {/* BOLINHA ENCHENDO TIPO BATERIA 🔋 */}
-            <View style={{ 
-              width: 60, 
-              height: 60, 
-              borderRadius: 30, 
-              backgroundColor: '#F0F5F5', 
-              overflow: 'hidden', 
-              justifyContent: 'flex-end', 
-              marginRight: 15,
-              borderWidth: 2,
-              borderColor: '#E0E5EC'
-            }}>
-              <View style={{ 
-                width: '100%', 
-                height: `${totalConvidados > 0 ? Math.round((confirmados / totalConvidados) * 100) : 0}%`, 
-                backgroundColor: '#55FF99' 
-              }} />
-              <View style={{ position: 'absolute', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#1A1A1A' }}>
-                  {totalConvidados > 0 ? Math.round((confirmados / totalConvidados) * 100) : 0}%
-                </Text>
+            {datas && datas.length > 0 && (
+              <View style={styles.featuredList}>
+                <Text style={[styles.featuredLabel, { color: colors.text }]}>Datas sugeridas</Text>
+                {datas.map((data: string, idx: number) => (
+                  <Text key={idx} style={[styles.featuredItem, { color: colors.subtitle }]}>• {data}</Text>
+                ))}
+              </View>
+            )}
+
+            <View style={styles.probabilityRow}>
+              <View style={[styles.probabilityCircle, { backgroundColor: colors.background, borderColor: colors.menuButtonBg }]}>
+                <View style={[styles.probabilityFill, { height: `${probabilidade}%`, backgroundColor: colors.success }]} />
+                <View style={styles.probabilityValueWrap}>
+                  <Text style={[styles.probabilityValue, { color: colors.text }]}>{probabilidade}%</Text>
+                </View>
+              </View>
+              <View style={styles.probabilityTextGroup}>
+                <Text style={[styles.probabilityTitle, { color: colors.text }]}>Chance de acontecer</Text>
+                <Text style={[styles.probabilitySubtitle, { color: colors.subtitle }]}>{confirmadosNum} de {convidadosNum} confirmados</Text>
               </View>
             </View>
-
-            {/* TEXTOS AO LADO DA BOLINHA */}
-            <View>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#1A1A1A' }}>
-                Chance de Acontecer
-              </Text>
-              <Text style={{ fontSize: 14, color: '#666' }}>
-                {confirmados} de {totalConvidados} confirmados
-              </Text>
-            </View>
-
+            <TouchableOpacity style={[styles.primaryAction, { backgroundColor: colors.primary }]} onPress={() => router.push({ pathname: '/details' } as any)}>
+              <Text style={[styles.primaryActionText, { color: colors.avatarText }]}>Votar Agora</Text>
+            </TouchableOpacity>
           </View>
-          {/* FIM DO BLOCO DA PORCENTAGEM */}
+        ) : (
+          <View style={[styles.emptyHighlightCard, { backgroundColor: colors.card, borderColor: colors.menuButtonBg }]}>
+            <Text style={styles.emptyHighlightEmoji}>🍺</Text>
+            <Text style={[styles.emptyHighlightTitle, { color: colors.text }]}>Nenhuma resenha lançada</Text>
+            <Text style={[styles.emptyHighlightText, { color: colors.subtitle }]}>Crie uma enquete acima para começar a agitar a galera.</Text>
+          </View>
+        )}
 
-          <TouchableOpacity 
-            style={{ backgroundColor: '#E0E5EC', padding: 15, borderRadius: 10, alignItems: 'center' }}
-            onPress={() => router.push('/details')} 
-          >
-            <Text style={{ fontWeight: 'bold', color: '#004643', fontSize: 16 }}>Votar Agora</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={{ backgroundColor: '#DC2626', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 }}
-            onPress={encerrarResenha} 
-          >
-            <Text style={{ fontWeight: 'bold', color: '#FFF', fontSize: 16 }}>Encerrar Resenha</Text>
-          </TouchableOpacity>
-
-        </View>
-
-      ) : (
-
-        // ---- CARD VAZIO (NENHUMA RESENHA) ----
-        <View style={{ backgroundColor: '#FFFFFF', padding: 30, borderRadius: 15, borderWidth: 2, borderColor: '#D0D8E0', borderStyle: 'dashed', alignItems: 'center' }}>
-          <Text style={{ fontSize: 40, marginBottom: 10 }}>🍺</Text>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#3A4A5A', marginBottom: 5 }}>
-            Nenhuma resenha lançada
-          </Text>
-          <Text style={{ fontSize: 14, color: '#8A9Aaa', textAlign: 'center' }}>
-            Crie uma enquete acima para começar a agitar a galera.
-          </Text>
-        </View>
-
-      )}
-
-        {/* SEÇÃO MEUS GRUPOS */}
-        <View style={[styles.sectionHeader, { marginTop: 15, alignItems: 'center' }]}>
-          <Text style={[styles.sectionTitle, { fontSize: 20 }]}>Meus Grupos</Text>
-          <TouchableOpacity>
-            <Text style={styles.linkText}>Ver Todos</Text>
+        <View style={styles.sectionHeader}> 
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Meus Grupos</Text>
+          <TouchableOpacity onPress={() => router.push('create-group')}>
+            <Text style={[styles.linkText, { color: colors.primary }]}>Criar grupo</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.groupCard}>
-          <View style={styles.groupIconBox}>
-            <Ionicons name="football-outline" size={24} color="#004643" />
+        {groups.length === 0 ? (
+          <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.menuButtonBg }]}>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum grupo ainda.</Text>
+            <Text style={[styles.emptySub, { color: colors.subtitle }]}>Crie um grupo para começar a adicionar membros e organizar seu time.</Text>
           </View>
-          <View style={styles.groupInfo}>
-            <Text style={styles.groupTitle}>Futebol de Quarta</Text>
-            <Text style={styles.groupSub}><Ionicons name="people" size={12} /> 18 membros</Text>
-          </View>
-          <View style={styles.groupStatus}>
-            <Text style={styles.statusActive}>ATIVO AGORA</Text>
-            <View style={styles.avatarStack}>
-              <View style={[styles.smallAvatar, { zIndex: 3, backgroundColor: '#3B82F6' }]}><Text style={styles.avatarTxt}>M</Text></View>
-              <View style={[styles.smallAvatar, { zIndex: 2, backgroundColor: '#EF4444', marginLeft: -10 }]}><Text style={styles.avatarTxt}>J</Text></View>
-              <View style={[styles.smallAvatar, { zIndex: 1, backgroundColor: '#64748B', marginLeft: -10 }]}><Text style={styles.avatarTxt}>+5</Text></View>
-            </View>
-          </View>
+        ) : (
+          groups.map((group) => (
+            <TouchableOpacity
+              key={group.id}
+              style={[styles.groupCard, { backgroundColor: colors.card, borderColor: colors.menuButtonBg }]}
+              onPress={() => router.push(`/group?groupId=${group.id}`)}
+            >
+              <View style={[styles.groupIconBox, { backgroundColor: colors.menuButtonBg }]}> 
+                <Ionicons name="people-circle" size={24} color={colors.primary} />
+              </View>
+              <View style={styles.groupInfo}>
+                <Text style={[styles.groupTitle, { color: colors.text }]}>{group.name}</Text>
+                <Text style={[styles.groupSub, { color: colors.subtitle }]}>{group.members.length} membros</Text>
+              </View>
+              <View style={styles.groupStatus}>
+                <Text style={group.status === 'active' ? styles.statusActive : styles.statusInactive}>
+                  {group.status === 'active' ? 'ATIVO' : 'INATIVO'}
+                </Text>
+                <View style={styles.avatarStack}>
+                  {group.members.slice(0, 3).map((member, index) => (
+                    <View
+                      key={member.id}
+                      style={[
+                        styles.smallAvatar,
+                        { zIndex: 10 - index, marginLeft: index === 0 ? 0 : -10, backgroundColor: member.avatarColor, borderColor: colors.card },
+                      ]}
+                    >
+                      {member.avatarUri ? (
+                        <Image source={{ uri: member.avatarUri }} style={styles.smallAvatarImage} />
+                      ) : (
+                        <Text style={[styles.avatarTxt, { color: colors.text }]}>{member.name.charAt(0)}</Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
+
+        <View style={styles.sectionHeader}> 
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Histórico de Enquetes</Text>
         </View>
 
-        <View style={styles.groupCard}>
-          <View style={[styles.groupIconBox, { backgroundColor: '#FEF2F2' }]}>
-            <Ionicons name="business-outline" size={24} color="#DC2626" />
+        {enquetes && enquetes.length > 0 ? (
+          enquetes.map((enquete: any, idx: number) => {
+              const isClickable = enquete.status === 'ativa';
+              const Wrapper: any = isClickable ? TouchableOpacity : View;
+              return (
+                <Wrapper
+                  key={enquete.id || idx}
+                  style={[styles.enqueteCard, { backgroundColor: colors.card, borderColor: colors.menuButtonBg }]}
+                  {...(isClickable
+                    ? {
+                        onPress: () => {
+                          setTituloEnquete(enquete.titulo);
+                          setEnqueteAtivaId(enquete.id);
+                          router.push({ pathname: '/details', params: { enqueteId: enquete.id } } as any);
+                        },
+                      }
+                    : {})}
+                >
+                  <View style={styles.enqueteCardContent}>
+                    <Text style={[styles.enqueteTitle, { color: colors.text }]}>{enquete.titulo}</Text>
+                    <Text style={[styles.enqueteMeta, { color: colors.subtitle }]}>{enquete.dataCriacao}</Text>
+                    <Text style={[styles.enqueteStatus, { color: enquete.status === 'ativa' ? colors.primary : colors.subtitle }]}>\
+                      {enquete.status === 'ativa' ? '● Ativa' : '● Encerrada'}
+                    </Text>
+                  </View>
+                  {enquete.status === 'ativa' && (
+                    <View style={[styles.enqueteBadge, { backgroundColor: colors.success }]}> 
+                      <Ionicons name="radio-button-on" size={14} color="#FFF" />
+                    </View>
+                  )}
+                </Wrapper>
+              );
+            })
+        ) : (
+          <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.menuButtonBg }]}>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhuma enquete criada</Text>
+            <Text style={[styles.emptySub, { color: colors.subtitle }]}>Crie sua primeira enquete acima para começar!</Text>
           </View>
-          <View style={styles.groupInfo}>
-            <Text style={styles.groupTitle}>Amigos do Prédio</Text>
-            <Text style={styles.groupSub}><Ionicons name="people" size={12} /> 42 membros</Text>
-          </View>
-          <View style={styles.groupStatus}>
-            <Text style={styles.statusInactive}>HÁ 2H</Text>
-            <View style={styles.avatarStack}>
-              <View style={[styles.smallAvatar, { zIndex: 2, backgroundColor: '#10B981' }]}><Text style={styles.avatarTxt}>C</Text></View>
-              <View style={[styles.smallAvatar, { zIndex: 1, backgroundColor: '#64748B', marginLeft: -10 }]}><Text style={styles.avatarTxt}>+12</Text></View>
-            </View>
-          </View>
-        </View>
+        )}
 
         <View style={styles.spacer} />
       </ScrollView>
@@ -235,61 +220,59 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FAFBFB' },
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
   scroll: { padding: 20 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 25 },
-  logo: { fontSize: 24, fontWeight: '900', color: '#004643', letterSpacing: -0.5 },
-  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1A1A1A', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#6EFFA8' },
-  
-  scoreCard: { backgroundColor: '#6EFFA8', borderRadius: 25, padding: 30, flexDirection: 'row', justifyContent: 'space-between', overflow: 'hidden', marginBottom: 25, elevation: 5 },
-  scoreContent: { flex: 1, position: 'relative', zIndex: 1 },
-  scoreLabel: { fontSize: 13, fontWeight: '800', color: '#004643', opacity: 0.6, letterSpacing: 1, marginBottom: 5 },
-  scoreValue: { fontSize: 72, fontWeight: '900', color: '#004643', lineHeight: 75, marginTop: -5 },
-  rankBadge: { backgroundColor: 'rgba(255,255,255,0.5)', paddingVertical: 8, paddingHorizontal: 15, borderRadius: 15, alignSelf: 'flex-start', marginTop: 8 },
-  rankBadgeText: { fontSize: 12, fontWeight: 'bold', color: '#004643' },
-  scoreBackgroundIcon: { position: 'absolute', right: -30, top: 10, opacity: 0.15 },
-  
-  btnCreate: { backgroundColor: '#004643', flexDirection: 'row', padding: 20, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginBottom: 35, elevation: 3 },
-  btnCreateText: { color: '#FFF', fontWeight: 'bold', fontSize: 17 },
-  
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
-  sectionTitle: { fontSize: 22, fontWeight: '800', color: '#1A1A1A', lineHeight: 26 },
-  liveTag: { backgroundColor: '#E8F5E9', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8 },
-  liveText: { fontSize: 11, fontWeight: '900', color: '#004643', letterSpacing: 0.5 },
-  linkText: { color: '#004643', fontWeight: '800', fontSize: 14 },
-  
-  eventCard: { backgroundColor: '#FFF', borderRadius: 25, flexDirection: 'row', overflow: 'hidden', marginBottom: 30, elevation: 3 },
-  sideBar: { width: 10, backgroundColor: '#6EFFA8' },
-  cardBody: { flex: 1, padding: 25 },
-  eventDate: { color: '#004643', fontWeight: '800', fontSize: 13, marginBottom: 8, letterSpacing: 0.5 },
-  eventTitle: { fontSize: 28, fontWeight: '800', color: '#1A1A1A', marginBottom: 20 },
-  chanceRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 25 },
-  circle: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#E2E8F0', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
-  circleFill: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#6EFFA8' },
-  circleInner: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center' },
-  circleText: { fontWeight: '900', fontSize: 14, color: '#1A1A1A' },
-  chanceTextColumn: { marginLeft: 15 },
-  chanceTitle: { fontWeight: '800', fontSize: 16, color: '#1A1A1A' },
-  chanceSub: { color: '#6B7280', fontSize: 13, marginTop: 3 },
-  btnVote: { backgroundColor: '#E2E8F0', padding: 18, borderRadius: 15, alignItems: 'center' },
-  btnVoteText: { color: '#004643', fontWeight: '800', fontSize: 16 },
-
-  // O CARD VAZIO QUE VOCÊ GOSTOU (Protegido contra bugs de renderização)
-  emptyCard: { backgroundColor: '#F8FAFC', borderRadius: 25, padding: 35, alignItems: 'center', marginBottom: 30, borderStyle: 'dashed', borderWidth: 2, borderColor: '#CBD5E1', overflow: 'hidden' },
-  emptyCardTitle: { fontSize: 18, fontWeight: '800', color: '#475569', marginBottom: 5 },
-  emptyCardSub: { fontSize: 14, color: '#94A3B8', textAlign: 'center', paddingHorizontal: 10, lineHeight: 20 },
-
-  groupCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 20, flexDirection: 'row', alignItems: 'center', marginBottom: 15, elevation: 2 },
-  groupIconBox: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#E8F5E9', justifyContent: 'center', alignItems: 'center', marginRight: 15 },
+  scoreCard: { backgroundColor: '#0F41D4', borderRadius: 24, padding: 24, marginBottom: 20, overflow: 'hidden', position: 'relative', elevation: 6, shadowColor: '#1E3A8A', shadowOpacity: 0.18, shadowRadius: 18, shadowOffset: { width: 0, height: 10 } },
+  scoreLabel: { fontSize: 12, fontWeight: '800', color: 'rgba(255,255,255,0.9)', letterSpacing: 1.2, marginBottom: 8 },
+  scoreValue: { fontSize: 64, fontWeight: '900', color: '#FFFFFF', lineHeight: 70 },
+  rankBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.2)', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, marginTop: 16 },
+  rankBadgeText: { color: '#FFFFFF', fontWeight: '800', marginLeft: 8 },
+  scoreBackgroundIcon: { position: 'absolute', right: -20, top: 12, opacity: 0.24 },
+  btnCreate: { backgroundColor: '#E7F0FF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 18, borderRadius: 18, borderWidth: 1, borderColor: '#D6E4FF', marginBottom: 24 },
+  btnCreateText: { color: '#0F41D4', fontWeight: '900', fontSize: 15, marginLeft: 10 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  sectionTitle: { fontSize: 22, fontWeight: '900', color: '#0F1724' },
+  linkText: { color: '#0F41D4', fontSize: 14, fontWeight: '800' },
+  featuredCard: { backgroundColor: '#FFFFFF', borderRadius: 22, padding: 22, borderWidth: 1, borderColor: '#CBD5E1', marginBottom: 24, shadowColor: '#000', shadowOpacity: 0.09, shadowRadius: 16, shadowOffset: { width: 0, height: 10 }, elevation: 5 },
+  featuredTag: { fontSize: 12, fontWeight: '900', color: '#0F41D4', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 12 },
+  featuredTitle: { fontSize: 24, fontWeight: '900', color: '#0F1724', marginBottom: 18 },
+  featuredList: { marginBottom: 18 },
+  featuredLabel: { fontSize: 14, fontWeight: '800', color: '#0F1724', marginBottom: 10 },
+  featuredItem: { fontSize: 14, color: '#64748B', marginLeft: 10, marginBottom: 4 },
+  probabilityRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 22 },
+  probabilityCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', overflow: 'hidden', justifyContent: 'flex-end', marginRight: 16 },
+  probabilityFill: { width: '100%', backgroundColor: '#16A34A' },
+  probabilityValueWrap: { position: 'absolute', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
+  probabilityValue: { fontSize: 18, fontWeight: '900', color: '#0F1724' },
+  probabilityTextGroup: { flex: 1 },
+  probabilityTitle: { fontSize: 16, fontWeight: '800', color: '#0F1724', marginBottom: 4 },
+  probabilitySubtitle: { fontSize: 14, color: '#64748B' },
+  primaryAction: { backgroundColor: '#0F41D4', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
+  primaryActionText: { color: '#FFFFFF', fontWeight: '900', fontSize: 15 },
+  emptyHighlightCard: { backgroundColor: '#FFFFFF', borderRadius: 22, padding: 30, borderWidth: 1, borderStyle: 'dashed', borderColor: '#94A3B8', alignItems: 'center', marginBottom: 24, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: 8 }, elevation: 4 },
+  emptyHighlightEmoji: { fontSize: 36, marginBottom: 14 },
+  emptyHighlightTitle: { fontSize: 18, fontWeight: '900', color: '#0F1724', marginBottom: 8 },
+  emptyHighlightText: { fontSize: 14, color: '#64748B', textAlign: 'center', lineHeight: 22 },
+  emptyState: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: '#CBD5E1', marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 3 },
+  emptyTitle: { fontSize: 16, fontWeight: '900', color: '#0F1724', marginBottom: 6 },
+  emptySub: { color: '#64748B', fontSize: 14, lineHeight: 20 },
+  groupCard: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 18, flexDirection: 'row', alignItems: 'center', marginBottom: 14, borderWidth: 1, borderColor: '#CBD5E1', shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: 8 }, elevation: 4 },
+  groupIconBox: { width: 48, height: 48, borderRadius: 16, backgroundColor: '#E7F0FF', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   groupInfo: { flex: 1 },
-  groupTitle: { fontSize: 16, fontWeight: '800', color: '#1A1A1A', marginBottom: 4 },
-  groupSub: { fontSize: 13, color: '#6B7280', fontWeight: '500' },
+  groupTitle: { fontSize: 15, fontWeight: '900', color: '#0F1724', marginBottom: 4 },
+  groupSub: { color: '#64748B', fontSize: 13 },
   groupStatus: { alignItems: 'flex-end' },
-  statusActive: { fontSize: 10, fontWeight: '900', color: '#004643', letterSpacing: 0.5, marginBottom: 8 },
-  statusInactive: { fontSize: 10, fontWeight: '800', color: '#64748B', letterSpacing: 0.5, marginBottom: 8 },
+  statusActive: { color: '#16A34A', fontWeight: '900', fontSize: 10, letterSpacing: 0.6 },
+  statusInactive: { color: '#94A3B8', fontWeight: '800', fontSize: 10, letterSpacing: 0.6 },
   avatarStack: { flexDirection: 'row' },
-  smallAvatar: { width: 24, height: 24, borderRadius: 12, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFF' },
-  avatarTxt: { color: '#FFF', fontSize: 9, fontWeight: 'bold' },
-
-  spacer: { height: 40 }
+  smallAvatar: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFFFFF', overflow: 'hidden' },
+  smallAvatarImage: { width: '100%', height: '100%', borderRadius: 14 },
+  avatarTxt: { color: '#0F1724', fontSize: 11, fontWeight: '900' },
+  enqueteCard: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: '#CBD5E1', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
+  enqueteCardContent: { flex: 1 },
+  enqueteTitle: { fontSize: 14, fontWeight: '800', color: '#0F1724', marginBottom: 4 },
+  enqueteMeta: { fontSize: 12, color: '#64748B', marginBottom: 6 },
+  enqueteStatus: { fontSize: 12, fontWeight: '600' },
+  enqueteBadge: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', backgroundColor: '#16A34A' },
+  spacer: { height: 30 }
 });
