@@ -3,7 +3,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as WebBrowser from 'expo-web-browser';
 import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
-import { AppState, Platform, Alert } from 'react-native';
+import { Alert, AppState, Platform } from 'react-native';
 import { supabase } from '../config/supabase';
 import { sendExpoPushNotifications } from '../utils/notifications';
 import { getStoredPushToken, registerForPushNotificationsAsync } from '../utils/registerPush';
