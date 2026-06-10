@@ -30,10 +30,10 @@ A navegação do aplicativo é gerenciada via **Expo Router** e divide-se nas se
 
 O aplicativo foi construído com foco em uma arquitetura *Offline-first* (sem backend em nuvem).
 
-* **Linguagem:** TypeScript (~19.1.0).
-* **Framework / Plataforma:** React Native (0.81.5) integrado à plataforma Expo (~54.0.33).
-* **Roteamento:** Expo Router (~6.0.23).
-* **Armazenamento de Dados:** AsyncStorage (^3.0.2) e Expo Secure Store (^55.0.11).
+* **Linguagem:** TypeScript .
+* **Framework / Plataforma:** React Native,integrado à plataforma Expo.
+* **Roteamento:** Expo Router).
+* **Armazenamento de Dados:** AsyncStorage e Expo Secure Store.
 * **Controle de Versão:** Git / GitHub.
 * **Dependências / Terceiros:**
   * *React Native Calendars* (seleção de datas).
