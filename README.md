@@ -1,50 +1,152 @@
-# Welcome to your Expo app 👋
+# Resenha Score 🎉
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Um app Expo/React Native para gerenciar resenhas em grupo com enquetes em tempo real, integrado com **Supabase** para autenticação e sincronização de dados.
 
-## Get started
+## 📋 Features
 
-1. Install dependencies
+- ✅ **Autenticação com Email/Senha** (via Supabase)
+- ✅ **Banco de Dados em Nuvem** (Supabase PostgreSQL)
+- ✅ **Sincronização em Tempo Real** (Supabase Realtime)
+- ✅ **Múltiplos Usuários** (cada um com suas enquetes)
+- ✅ **Votação em Enquetes** (sim, não, talvez)
+- ✅ **Histórico de Resenhas** (persistência completa)
+- ✅ **Álbum de Fotos** (estrutura pronta)
 
-   ```bash
-   npm install
-   ```
+## 🚀 Quick Start
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### 1. Clonar e Instalar
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configurar Supabase
+Veja [SUPABASE_SETUP.md](SUPABASE_SETUP.md) para instruções completas.
 
-## Learn more
+Resumo rápido:
+1. Criar conta em [supabase.com](https://supabase.com)
+2. Copiar URL e ANON_KEY
+3. Preencher `.env` com as variáveis
+4. Executar SQL em `supabase/schema.sql`
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Iniciar o App
+```bash
+npm start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Abrir em:
+- iOS Simulator: tecle `i`
+- Android Emulator: tecle `a`
+- Expo Go: escanear QR code
 
-## Join the community
+### 4. Testar Login
+- Email: qualquer email válido
+- Senha: qualquer senha
+- Signup: criar nova conta
+- App sincroniza automaticamente com Supabase
 
-Join our community of developers creating universal apps.
+## 📁 Estrutura
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```
+app/
+  ├── _layout.tsx              # Roteamento protegido
+  ├── auth-layout.tsx          # Proteção de rotas
+  ├── login.tsx                # Tela de Login/Signup
+  ├── GlobalContext.tsx        # Context com Supabase integration
+  ├── (tabs)/                  # Abas principais (Index, Album, History, Create)
+  │   ├── _layout.tsx
+  │   ├── index.tsx            # Tela inicial
+  │   ├── album.tsx            
+  │   ├── create.tsx           # Criar enquete
+  │   ├── history.tsx
+  │   └── details.tsx
+  └── modal.tsx
+
+config/
+  └── supabase.ts             # Configuração Supabase
+
+supabase/
+  └── schema.sql              # DDL das tabelas + RLS
+
+.env.example                  # Template de variáveis
+SUPABASE_SETUP.md            # Guia de setup completo
+```
+
+## 🔐 Autenticação
+
+### Fluxo
+1. Usuário abre app → verifica sessão
+2. Se não autenticado → redireciona para `/login`
+3. Signup/Login via Supabase Auth
+4. App carrega enquetes do usuário
+5. Listeners em tempo real sincronizam mudanças
+
+### Código
+```typescript
+const { signIn, signUp, signOut, user, session } = useAppContext();
+
+// Login
+await signIn(email, password);
+
+// Registrar
+await signUp(email, password, name);
+
+// Logout
+await signOut();
+```
+
+## 🔄 Sincronização em Tempo Real
+
+Quando **outro usuário** modifica uma enquete:
+- `enquetes` table: novos eventos são emitidos
+- Listeners no `GlobalContext` capturam mudanças
+- React state atualiza automaticamente
+- UI renderiza em tempo real
+
+Tabelas com Realtime ativado:
+- `enquetes`
+- `members`
+- `votos`
+
+## 📊 Tabelas Supabase
+
+### `enquetes`
+```sql
+id, userId, titulo, status, presentes, fotos, locais[], datas[], ...
+```
+
+### `members`
+```sql
+id, enqueteId, name, points
+```
+
+### `votos`
+```sql
+id, enqueteId, memberId, tipo ('sim'|'nao'|'talvez'), timestamp
+```
+
+## 🛡️ Segurança (RLS)
+
+Cada usuário:
+- ✅ Vê apenas suas enquetes
+- ✅ Não pode editar enquetes de outro usuário
+- ✅ RLS ativa em todas as tabelas
+- ✅ Autenticação via Supabase Sessions
+
+## 📝 Próximos Passos
+
+- [ ] Testar com múltiplos devices
+- [ ] Compartilhamento de enquetes (código/link convite)
+- [ ] Upload de fotos (Supabase Storage)
+- [ ] Notificações em tempo real
+- [ ] Build para produção (EAS)
+- [ ] Monetização
+
+## 📚 Documentação
+
+- [Supabase Docs](https://supabase.com/docs)
+- [Expo Router](https://expo.dev/router)
+- [React Native](https://reactnative.dev)
+
+## 🤝 Suporte
+
+Problemas? Veja [SUPABASE_SETUP.md](SUPABASE_SETUP.md) → Troubleshooting
